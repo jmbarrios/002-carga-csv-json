@@ -1,0 +1,144 @@
+name: Autograding Tests
+'on':
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pandas
+    
+    - name: Test 01 Cargar CSV
+      id: test-01-cargar-csv
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Cargar CSV (Worldbank)'
+        command: 'pytest tests/test_01_cargar_csv.py -v'
+        timeout: 2
+        max-score: 10
+        setup-command: 'pip install pytest pandas'
+    
+    - name: Test 02 Nulos CSV
+      id: test-02-na-csv
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Manejo de Nulos .. en CSV'
+        command: 'pytest tests/test_02_na_csv.py -v'
+        timeout: 2
+        max-score: 10
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 03 Tipos CSV
+      id: test-03-tipos-csv
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Tipos y Memoria en CSV'
+        command: 'pytest tests/test_03_tipos_csv.py -v'
+        timeout: 2
+        max-score: 20
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 04 Cargar JSON Anual
+      id: test-04-cargar-json-anual
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Cargar JSON (Anual)'
+        command: 'pytest tests/test_04_cargar_json_anual.py -v'
+        timeout: 2
+        max-score: 10
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 05 Cargar JSON Escolar
+      id: test-05-cargar-json-escolar
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Cargar JSON (Escolar)'
+        command: 'pytest tests/test_05_cargar_json_escolar.py -v'
+        timeout: 2
+        max-score: 10
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 06 Indices JSON Anual
+      id: test-06-indices-json-anual
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Índices JSON (Anual)'
+        command: 'pytest tests/test_06_indices_json_anual.py -v'
+        timeout: 2
+        max-score: 15
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 07 Indices JSON Escolar
+      id: test-07-indices-json-escolar
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Índices JSON (Escolar)'
+        command: 'pytest tests/test_07_indices_json_escolar.py -v'
+        timeout: 2
+        max-score: 15
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 08 Tipos JSON Anual
+      id: test-08-tipos-json-anual
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Tipos de Datos JSON (Anual)'
+        command: 'pytest tests/test_08_tipos_json_anual.py -v'
+        timeout: 2
+        max-score: 20
+        setup-command: 'pip install pytest pandas'
+
+    - name: Test 09 Tipos JSON Escolar
+      id: test-09-tipos-json-escolar
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Tipos de Datos JSON (Escolar)'
+        command: 'pytest tests/test_09_tipos_json_escolar.py -v'
+        timeout: 2
+        max-score: 20
+        setup-command: 'pip install pytest pandas'
+
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-01-CARGAR-CSV_RESULTS: "${{steps.test-01-cargar-csv.outputs.result}}"
+        TEST-02-NA-CSV_RESULTS: "${{steps.test-02-na-csv.outputs.result}}"
+        TEST-03-TIPOS-CSV_RESULTS: "${{steps.test-03-tipos-csv.outputs.result}}"
+        TEST-04-CARGAR-JSON-ANUAL_RESULTS: "${{steps.test-04-cargar-json-anual.outputs.result}}"
+        TEST-05-CARGAR-JSON-ESCOLAR_RESULTS: "${{steps.test-05-cargar-json-escolar.outputs.result}}"
+        TEST-06-INDICES-JSON-ANUAL_RESULTS: "${{steps.test-06-indices-json-anual.outputs.result}}"
+        TEST-07-INDICES-JSON-ESCOLAR_RESULTS: "${{steps.test-07-indices-json-escolar.outputs.result}}"
+        TEST-08-TIPOS-JSON-ANUAL_RESULTS: "${{steps.test-08-tipos-json-anual.outputs.result}}"
+        TEST-09-TIPOS-JSON-ESCOLAR_RESULTS: "${{steps.test-09-tipos-json-escolar.outputs.result}}"
+      with:
+        runners: |
+          test-01-cargar-csv,
+          test-02-na-csv,
+          test-03-tipos-csv,
+          test-04-cargar-json-anual,
+          test-05-cargar-json-escolar,
+          test-06-indices-json-anual,
+          test-07-indices-json-escolar,
+          test-08-tipos-json-anual,
+          test-09-tipos-json-escolar
